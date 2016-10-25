@@ -48,6 +48,7 @@ extern void register_glcanvas(py::module &m);
 extern void register_formhelper(py::module &m);
 extern void register_misc(py::module &m);
 extern void register_glutil(py::module &m);
+extern void register_arcball(py::module &m);
 
 class MainloopHandle;
 static MainloopHandle *handle = nullptr;

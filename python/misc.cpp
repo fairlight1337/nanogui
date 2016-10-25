@@ -84,6 +84,11 @@ void register_misc(py::module &m) {
         .def("setImages", &ImagePanel::setImages, D(ImagePanel, setImages))
         .def("callback", &ImagePanel::callback, D(ImagePanel, callback))
         .def("setCallback", &ImagePanel::setCallback, D(ImagePanel, setCallback));
+
+    py::class_<Arcball>(m, "Arcball")
+      .def(py::init<>())
+      .def(py::init<float>())
+      .def("setSize", &Arcball::setSize);
 }
 
 #endif
