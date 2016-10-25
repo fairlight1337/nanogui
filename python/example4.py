@@ -20,7 +20,8 @@ from nanogui import Color, Screen, Window, GroupLayout, BoxLayout, \
                     PopupButton, CheckBox, MessageDialog, VScrollPanel, \
                     ImagePanel, ImageView, ComboBox, ProgressBar, Slider, \
                     TextBox, ColorWheel, Graph, GridLayout, \
-                    Alignment, Orientation, TabWidget, IntBox, GLShader, GLCanvas
+                    Alignment, Orientation, TabWidget, IntBox, GLShader, GLCanvas, \
+                    Arcball
 
 from nanogui import gl, glfw, entypo
 
@@ -35,7 +36,7 @@ class TestApp(Screen):
 
         self.canvas = GLCanvas(window)
         self.canvas.setBackgroundColor(Color(0.5, 0.5, 0.5, 1.0))
-        self.canvas.setSize((400, 400))
+        self.canvas.setSize((300, 300))
 
         self.rotation = [0.25, 0.5, 0.33]
 
@@ -94,6 +95,44 @@ class TestApp(Screen):
         def cb1():
             self.rotation = [random.random(), random.random(), random.random()]
         b1.setCallback(cb1)
+
+        windowAB = Window(self, "Cube Arcball Demo")
+        windowAB.setPosition((360, 15))
+        windowAB.setLayout(GroupLayout())
+
+        self.canvasAB = GLCanvas(windowAB)
+        self.canvasAB.setBackgroundColor(Color(0.5, 0.5, 0.5, 1.0))
+        self.canvasAB.setSize((300, 300))
+
+        self.arcball = Arcball()
+        self.arcball.setSize((300, 300))
+
+        def cbAB():
+            if self.shader is not None:
+                import numpy as np
+                self.shader.bind()
+
+                print(1)
+                mvp = self.arcball.matrix()
+                print(2)
+                mvp[:, 3] = [[0], [0], [1], [4]]
+
+                self.shader.setUniform("modelViewProj", mvp)
+
+                gl.glEnable(gl.DEPTH_TEST)
+                self.shader.drawIndexed(gl.TRIANGLES, 0, 12)
+                gl.glDisable(gl.DEPTH_TEST)
+
+        self.canvasAB.setGLDrawingCallback(cbAB)
+        toolsAB = Widget(windowAB)
+        toolsAB.setLayout(BoxLayout(Orientation.Horizontal,
+                                    Alignment.Middle, 0, 5))
+
+        b2 = Button(toolsAB, "Reset rotation")
+        def cb2():
+            self.arcball.setState(np.matrix([1, 0, 0, 0], [0, 1, 0, 0],
+                                            [0, 0, 1, 0], [0, 0, 0, 1]))
+        b2.setCallback(cb2)
 
         self.performLayout()
 
