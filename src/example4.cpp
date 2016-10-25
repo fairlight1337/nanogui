@@ -83,7 +83,7 @@ public:
 
         mCanvas = new GLCanvas(window);
         mCanvas->setBackgroundColor({100, 100, 100, 255});
-        mCanvas->setSize({400, 400});
+        mCanvas->setSize({300, 300});
 
         mRotation = Vector3f(0.25, 0.5, 0.33);
 
@@ -114,6 +114,50 @@ public:
 
         Button *b1 = new Button(tools, "Random Rotation");
         b1->setCallback([this]() { mRotation = Vector3f((rand() % 100) / 100.0, (rand() % 100) / 100.0, (rand() % 100) / 100.0); });
+
+        Window *windowAB = new Window(this, "Cube Arcball Demo");
+        windowAB->setPosition(Vector2i(360, 15));
+        windowAB->setLayout(new GroupLayout());
+
+        mCanvasAB = new GLCanvas(windowAB);
+        mCanvasAB->setBackgroundColor({100, 100, 100, 255});
+        mCanvasAB->setSize({300, 300});
+
+	mArcball.setSize({300, 300});
+
+        Widget *toolsAB = new Widget(windowAB);
+        toolsAB->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 5));
+
+        Button *b2 = new Button(toolsAB, "Reset rotation");
+        b2->setCallback([this]() {
+            mArcball.setState(nanogui::Quaternionf::Identity());
+          });
+
+        mCanvasAB->setGLDrawingCallback([this]() {
+            mShader.bind();
+
+            Matrix4f mvp;
+            mvp.setIdentity();
+
+            mvp = mArcball.matrix();
+            mvp.topRightCorner<4, 1>() = Vector4f(0, 0, 1, 4);
+
+            mShader.setUniform("modelViewProj", mvp);
+
+            glEnable(GL_DEPTH_TEST);
+            /* Draw 12 triangles starting at index 0 */
+            mShader.drawIndexed(GL_TRIANGLES, 0, 12);
+            glDisable(GL_DEPTH_TEST);
+          });
+
+        mCanvasAB->setMouseMotionCallback([this](const Vector2i &p, const Vector2i&, int, int) {
+            mArcball.motion(p);
+	  });
+
+        mCanvasAB->setMouseButtonCallback([this](const Vector2i &p, int, bool down, int) {
+            mArcball.button(p, down);
+          });
 
         performLayout();
 
@@ -209,8 +253,10 @@ public:
     }
 private:
     nanogui::GLCanvas *mCanvas;
+    nanogui::GLCanvas *mCanvasAB;
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
+    nanogui::Arcball mArcball;
 };
 
 int main(int /* argc */, char ** /* argv */) {
