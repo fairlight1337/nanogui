@@ -88,7 +88,11 @@ void register_misc(py::module &m) {
     py::class_<Arcball>(m, "Arcball")
       .def(py::init<>())
       .def(py::init<float>())
-      .def("setSize", &Arcball::setSize);
+      .def("setSize", &Arcball::setSize)
+      .def("setState", &Arcball::setState)
+      .def("matrix", (nanogui::Matrix4f(void)const)&Arcball::matrix)
+      .def("motion", &Arcball::matrix)
+      .def("button", &Arcball::matrix);
 }
 
 #endif
