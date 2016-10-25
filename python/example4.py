@@ -112,10 +112,9 @@ class TestApp(Screen):
                 import numpy as np
                 self.shader.bind()
 
-                print(1)
                 mvp = self.arcball.matrix()
-                print(2)
-                mvp[:, 3] = [[0], [0], [1], [4]]
+                mvp[3, 2] = 1
+                mvp[3, 3] = 4
 
                 self.shader.setUniform("modelViewProj", mvp)
 
@@ -128,10 +127,18 @@ class TestApp(Screen):
         toolsAB.setLayout(BoxLayout(Orientation.Horizontal,
                                     Alignment.Middle, 0, 5))
 
+        def cb_mousemotion(p, r, i1, i2):
+            self.arcball.motion(p)
+        self.canvasAB.setMouseMotionCallback(cb_mousemotion)
+
+        def cb_mousebutton(p, button, down, modifier):
+            self.arcball.button(p, down)
+        self.canvasAB.setMouseButtonCallback(cb_mousebutton)
+
         b2 = Button(toolsAB, "Reset rotation")
         def cb2():
-            self.arcball.setState(np.matrix([1, 0, 0, 0], [0, 1, 0, 0],
-                                            [0, 0, 1, 0], [0, 0, 0, 1]))
+            self.arcball = Arcball()
+            self.arcball.setSize((300, 300))
         b2.setCallback(cb2)
 
         self.performLayout()
