@@ -12,7 +12,9 @@ void register_glcanvas(py::module &m) {
         .def("setBackgroundColor", &GLCanvas::setBackgroundColor)
         .def("drawBorder", &GLCanvas::drawBorder)
         .def("setDrawBorder", &GLCanvas::setDrawBorder)
-        .def("setGLDrawingCallback", &GLCanvas::setGLDrawingCallback);
+        .def("setGLDrawingCallback", &GLCanvas::setGLDrawingCallback)
+        .def("setMouseMotionCallback", &GLCanvas::setMouseMotionCallback)
+        .def("setMouseButtonCallback", &GLCanvas::setMouseButtonCallback);
 }
 
 #endif
