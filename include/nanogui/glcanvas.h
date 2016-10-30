@@ -1,5 +1,5 @@
 /*
-    nanogui/glcanvas.h -- Canvas widget for rendering GL
+    nanogui/glcanvas.h -- Canvas widget for rendering OpenGL content
 
     NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
@@ -8,7 +8,6 @@
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE.txt file.
 */
-/** \file */
 
 #pragma once
 
@@ -22,8 +21,14 @@ NAMESPACE_BEGIN(nanogui)
 
 /**
  * \class GLCanvas glcanvas.h nanogui/glcanvas.h
+ * \brief Canvas widget for rendering OpenGL content
  *
- * \brief Canvas widget for rendering GL
+ * Canvas widget that can be used to display arbitrary OpenGL content. This is
+ * useful to display and manipulate 3D objects as part of an interactive
+ * application. The implementation uses scissoring to ensure that rendered
+ * objects don't spill into neighboring widgets.
+ *
+ * Usage: override `drawGL` in subclasses to provide custom drawing code.
  */
 class NANOGUI_EXPORT GLCanvas : public Widget {
 public:
@@ -42,17 +47,9 @@ public:
     /// Draw the canvas
     virtual void draw(NVGcontext *ctx) override;
 
-    /// Set the function invoked when the canvas content needs to be drawn
-    void setGLDrawingCallback(std::function<void()> fncDraw);
-
-    /// React to mouse events (motion and button press/release events)
-    virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers);
-    virtual bool mouseMotionEvent(const Vector2i &p, const Vector2i &rel, int button, int modifiers);
-
-    /// Set callback for when a mouse button event is received
-    void setMouseButtonCallback(std::function<void(const Vector2i&, int, bool, int)> fncMouseButtonCallback);
-    /// Set callback for when a mouse motion event is received
-    void setMouseMotionCallback(std::function<void(const Vector2i&, const Vector2i&, int, int)> fncMouseMotionCallback);
+    /// Draw the GL scene. Override this method to draw the actual GL
+    /// content.
+    virtual void drawGL() {}
 
     /// Save and load widget properties
     virtual void save(Serializer &s) const override;
@@ -64,9 +61,6 @@ protected:
 
 protected:
     Color mBackgroundColor;
-    std::function<void()> mDrawingCallback;
-    std::function<void(const Vector2i&, int, bool, int)> mMouseButtonCallback;
-    std::function<void(const Vector2i&, const Vector2i&, int, int)> mMouseMotionCallback;
     bool mDrawBorder;
 };
 
